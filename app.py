@@ -11,7 +11,7 @@ if not os.path.exists(file_name):
 
 def add_expense():
     try:
-        date = datetime.strptime(input("Enter date (YYYY-MM-DD): "), "%Y-%m-%d").date()
+        date = datetime.strptime(input("Enter date (DD-MM-YYYY): "), "%d-%m-%Y").date()
         category=input("Enter the category : ")
         amount=float(input("Enter the expense : "))
         description=input("Enter description og ")
@@ -64,26 +64,57 @@ def view_expenses():
 def monthly_summary():
     time_period = input("Enter month and year (mm-yyyy): ")
     month, year = map(int, time_period.split('-'))
-
+    if (month>12 and month<1) or (year<1):
+        print("Enter valid month. ")
+        return
     total_spending = 0
-    category_totals = {}
+    category_wise_amount = {}
 
     with open(file_name, 'r') as file:
         next(file)  # skipin column names
         for line in file:
             date_str, category, amount_str, description = line.strip().split(',')
-            date = datetime.strptime(date_str, "%Y-%m-%d")
+            date = datetime.strptime(date_str, "%d-%m-%Y")
             amount = float(amount_str)
 
             if date.month == month and date.year == year:
                 total_spending += amount
-                category_totals[category] = category_totals.get(category, 0) + amount
+                category_wise_amount[category] = category_wise_amount.get(category, 0) + amount
 
     if total_spending == 0:
         print(f"No expenses for {time_period}.")
         return
 
     print(f"\nMonthly Summary for {time_period}:")
+    print(f"Total spending: {total_spending:.2f}")
+    print("Spending by category:")
+    for cat, amt in category_wise_amount.items():
+        print(f"{cat}: {amt:.2f}")
+
+    highest = max(category_wise_amount, key=category_wise_amount.get)
+    lowest = min(category_wise_amount, key=category_wise_amount.get)
+    print(f"\nHighest spending category: {highest} ({category_wise_amount[highest]:.2f})")
+    print(f"Lowest spending category: {lowest} ({category_wise_amount[lowest]:.2f})")
+
+
+def overall_summary():
+    total_spending = 0
+    category_totals = {}
+
+    with open(file_name, 'r') as file:
+        next(file)  # skip header
+        for line in file:
+            date_str, category, amount_str, description = line.strip().split(',')
+            amount = float(amount_str)
+
+            total_spending += amount
+            category_totals[category] = category_totals.get(category, 0) + amount
+
+    if total_spending == 0:
+        print("No expenses recorded yet.")
+        return
+
+    print("\nOverall Expense Summary:")
     print(f"Total spending: {total_spending:.2f}")
     print("Spending by category:")
     for cat, amt in category_totals.items():
@@ -93,6 +124,7 @@ def monthly_summary():
     lowest = min(category_totals, key=category_totals.get)
     print(f"\nHighest spending category: {highest} ({category_totals[highest]:.2f})")
     print(f"Lowest spending category: {lowest} ({category_totals[lowest]:.2f})")
+
 
 # add_expense()
 # view_expenses()
