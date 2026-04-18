@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 categories = {
     1: "Food",
     2: "Travel",
-    3: "Bills",
+    3: "Bills\t",
     4: "Shopping",
     5: "Health",
     6: "Education",
@@ -25,7 +25,9 @@ if not os.path.exists(file_name):
 
 def add_expense():
     try:
-        date = datetime.strptime(input("Enter date (DD-MM-YYYY): "), "%d-%m-%Y").date()
+        date = datetime.strptime(input("\nEnter expense details\nEnter date (DD-MM-YYYY): "), "%d-%m-%Y").date()
+        #convert date into string
+        date_str=date.strftime("%d-%m-%Y")
         category_no = int(input(
             "1: Food\n"
             "2: Travel\n"
@@ -44,8 +46,8 @@ def add_expense():
         # adding data to the expenses file
         with open(file_name, mode='a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow([date, category, amount, description])
-        print("added new expense")
+            writer.writerow([date_str, category, amount, description])
+        print("Added new expense")
 
     except ValueError:
         print("Enter valid details.")
@@ -59,8 +61,8 @@ def view_expenses():
         if len(rows)<=1:
             print("No enpenses added.")
             return 
-    print("\n...All expenses...")
-    print("S.no \tDate \tCategory \tAamount \tDescription")
+    print("\n\t\t\t...All expenses...")
+    print(f"{'S.no':<10} {'Date':<12} {'Category':<17} {'Amount':<10} {'Description':<20}")
     for i in range(1, len(rows)):
         single_row = rows[i]
 
@@ -69,7 +71,8 @@ def view_expenses():
         amount = single_row[2]
         description = single_row[3]
 
-        print(i,"\t", date,"\t", category,"\t", amount,"\t", description)
+        # print(f"{i:<5} {date:<12} {category:<15} {amount:<10.2f} {description:<20}")
+        print(f"{i:<10} {date:<12} {category:<17} {amount:<10} {description:<20}")
 
 
 # def monthly_summary():
@@ -257,4 +260,49 @@ def delete_expense():
 
 # monthly_visual_summary()
 # overall_visual_summary()
-delete_expense()
+# delete_expense()
+
+def main():
+    print("\n\n\t\t\tSmart expense Tracker")
+    while(True):
+        try:
+            print("\n\n\t\tMenu")
+            option=int(input("1: Add new expense\n"
+                "2: Delete existing expense\n"
+                "3: View all expenses\n"
+                "4: View monthly summary\n"
+                "5: View overall summary\n"
+                "6: Exit\n"
+                "Choose from above options: "))
+            print("\n\n")
+            if option==1:
+                add_expense()
+            elif option==2:
+                delete_expense()
+            elif option==3:
+                view_expenses()
+            elif option==4:
+                monthly_temp=int(input("1: Visual summary\n2:Descriptive summary\n"))
+                if monthly_temp==1:
+                    monthly_visual_summary()
+                elif monthly_temp==2:
+                    monthly_summary()
+                else:
+                    print("Invalid input")
+            elif option==5:
+                overall_temp=int(input("1: Visual summary\n2:Descriptive summary\n"))
+                if overall_temp==1:
+                    overall_visual_summary()
+                elif overall_temp==2:
+                    overall_summary()
+                else:
+                    print("Invalid input.")
+            elif option==6:
+                print("Closing application...")
+                return 
+            else:
+                raise ValueError
+        except ValueError:
+            print("Choose valid option.")
+
+main()
