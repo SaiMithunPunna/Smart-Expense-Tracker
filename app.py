@@ -1,6 +1,9 @@
 from datetime import datetime
 import csv 
 import os
+import matplotlib.pyplot as plt
+
+
 
 file_name = "expenses.csv"
 #creating expenses file if not available
@@ -61,7 +64,7 @@ def view_expenses():
 #     #highest spending category and lowest spending category
 
 
-def monthly_summary():
+def monthly_summary(ret_data=False):
     time_period = input("Enter month and year (mm-yyyy): ")
     month, year = map(int, time_period.split('-'))
     if (month>12 and month<1) or (year<1):
@@ -85,21 +88,29 @@ def monthly_summary():
         print(f"No expenses for {time_period}.")
         return
 
+    highest = max(category_wise_amount, key=category_wise_amount.get)
+    lowest = min(category_wise_amount, key=category_wise_amount.get)
+
+
+    if(ret_data):
+        return category_wise_amount, time_period  , total_spending
+    
+
     print(f"\nMonthly Summary for {time_period}:")
     print(f"Total spending: {total_spending:.2f}")
     print("Spending by category:")
     for cat, amt in category_wise_amount.items():
         print(f"{cat}: {amt:.2f}")
 
-    highest = max(category_wise_amount, key=category_wise_amount.get)
-    lowest = min(category_wise_amount, key=category_wise_amount.get)
+   
     print(f"\nHighest spending category: {highest} ({category_wise_amount[highest]:.2f})")
     print(f"Lowest spending category: {lowest} ({category_wise_amount[lowest]:.2f})")
 
+    return 
 
-def overall_summary():
+def overall_summary(ret_data=False):
     total_spending = 0
-    category_totals = {}
+    category_wise_amount = {}
 
     with open(file_name, 'r') as file:
         next(file)  # skip header
@@ -108,24 +119,69 @@ def overall_summary():
             amount = float(amount_str)
 
             total_spending += amount
-            category_totals[category] = category_totals.get(category, 0) + amount
+            category_wise_amount[category] = category_wise_amount.get(category, 0) + amount
 
     if total_spending == 0:
         print("No expenses recorded yet.")
         return
 
+    highest = max(category_wise_amount, key=category_wise_amount.get)
+    lowest = min(category_wise_amount, key=category_wise_amount.get)
+
+    if(ret_data):
+        return category_wise_amount , total_spending
+    
     print("\nOverall Expense Summary:")
     print(f"Total spending: {total_spending:.2f}")
     print("Spending by category:")
-    for cat, amt in category_totals.items():
+    for cat, amt in category_wise_amount.items():
         print(f"{cat}: {amt:.2f}")
 
-    highest = max(category_totals, key=category_totals.get)
-    lowest = min(category_totals, key=category_totals.get)
-    print(f"\nHighest spending category: {highest} ({category_totals[highest]:.2f})")
-    print(f"Lowest spending category: {lowest} ({category_totals[lowest]:.2f})")
+    
+    print(f"\nHighest spending category: {highest} ({category_wise_amount[highest]:.2f})")
+    print(f"Lowest spending category: {lowest} ({category_wise_amount[lowest]:.2f})")
+    return 
 
 
+
+def monthly_visual_summary():
+    data = monthly_summary(ret_data=True)
+    if not data:
+        return  
+
+    category_wise_amount, time_period, total_spending = data
+
+    #pie chart
+    labels = list(category_wise_amount.keys())
+    amounts = list(category_wise_amount.values())
+
+    plt.figure(figsize=(8, 6))
+    plt.pie(amounts, labels=labels, autopct='%1.1f%%', startangle=140)
+    plt.title(f'Monthly Expense Distribution for {time_period}\nTotal: {total_spending:.2f}')
+    plt.axis('equal')  #to get cicular pie
+    plt.show()
+
+
+def overall_visual_summary():
+    data = overall_summary(ret_data=True)
+    if not data:
+        return  
+
+    category_wise_amount, total_spending = data
+
+    # pie chart
+    labels = list(category_wise_amount.keys())
+    amounts = list(category_wise_amount.values())
+
+    plt.figure(figsize=(8, 6))
+    plt.pie(amounts, labels=labels, autopct='%1.1f%%', startangle=140)
+    plt.title(f'Overall Expenses Category wise\nTotal: {total_spending:.2f}\n')
+    plt.axis('equal')
+    plt.show()
 # add_expense()
 # view_expenses()
-monthly_summary()
+# monthly_summary()
+# overall_summary()
+
+# monthly_visual_summary()
+overall_visual_summary()
