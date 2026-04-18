@@ -1,6 +1,6 @@
 Date,Category,Amount,Description
-05-01-2026,Food,250.0,Lunch at cafe
 10-01-2026,Travel,1200.0,Train ticket
+05-01-2026,Food,250.0,Lunch at cafe
 12-01-2026,Bills,300.0,Electricity bill
 15-01-2026,Shopping,450.0,Clothes
 18-01-2026,Health,150.0,Pharmacy
@@ -8,7 +8,6 @@ Date,Category,Amount,Description
 22-01-2026,Entertainment,200.0,Movie tickets
 25-01-2026,Investment,1000.0,Stocks
 28-01-2026,Other,75.0,Gifts
-03-02-2026,Food,180.0,Dinner
 08-02-2026,Travel,2200.0,Flight ticket
 10-02-2026,Bills,500.0,Water bill
 15-02-2026,Shopping,800.0,Shoes

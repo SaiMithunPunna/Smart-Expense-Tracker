@@ -3,6 +3,17 @@ import csv
 import os
 import matplotlib.pyplot as plt
 
+categories = {
+    1: "Food",
+    2: "Travel",
+    3: "Bills",
+    4: "Shopping",
+    5: "Health",
+    6: "Education",
+    7: "Entertainment",
+    8: "Investment",
+    9: "Other"
+}
 
 
 file_name = "expenses.csv"
@@ -15,7 +26,18 @@ if not os.path.exists(file_name):
 def add_expense():
     try:
         date = datetime.strptime(input("Enter date (DD-MM-YYYY): "), "%d-%m-%Y").date()
-        category=input("Enter the category : ")
+        category_no = int(input(
+            "1: Food\n"
+            "2: Travel\n"
+            "3: Bills\n"
+            "4: Shopping\n"
+            "5: Health\n"
+            "6: Education\n"
+            "7: Entertainment\n"
+            "8: Investment\n"
+            "9: Other\n"
+            "Choose the category from above: "))
+        category=categories[category_no]
         amount=float(input("Enter the expense : "))
         description=input("Enter description og ")
 
@@ -178,10 +200,61 @@ def overall_visual_summary():
     plt.title(f'Overall Expenses Category wise\nTotal: {total_spending:.2f}\n')
     plt.axis('equal')
     plt.show()
+
+def delete_expense():
+    try:
+        date_input = input("Enter the date of the expense to delete (DD-MM-YYYY): ")
+        date = datetime.strptime(date_input, "%d-%m-%Y").date()
+        category_no = int(input(
+            "1: Food\n"
+            "2: Travel\n"
+            "3: Bills\n"
+            "4: Shopping\n"
+            "5: Health\n"
+            "6: Education\n"
+            "7: Entertainment\n"
+            "8: Investment\n"
+            "9: Other\n"
+            "Choose the category from above: "))
+        category=categories[category_no]
+        amount = float(input("Enter the amount of the expense: "))
+
+        # opeing file with read mode 
+        with open(file_name, mode='r') as file:
+            reader = csv.reader(file)
+            rows = list(reader)
+
+        # Find matching expense
+        new_rows = [rows[0]] 
+        deleted = False
+
+        for row in rows[1:]:
+            row_date = datetime.strptime(row[0], "%d-%m-%Y").date()
+            row_category = row[1]
+            row_amount = float(row[2])
+
+            if row_date == date and row_category == category and row_amount == amount and not deleted:
+                deleted = True  # delete only the first one ( if more than onee is there)
+                print(f"Deleted expense: {row_date} | {row_category} | {row_amount} | {row[3]}")
+                continue
+            new_rows.append(row)
+
+        if not deleted:
+            print("No matching expense found.")
+            return
+
+        # updating CSV without the deleted expense
+        with open(file_name, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerows(new_rows)
+
+    except ValueError:
+        print("Invalid input. Please check date format or amount.")
 # add_expense()
 # view_expenses()
 # monthly_summary()
 # overall_summary()
 
 # monthly_visual_summary()
-overall_visual_summary()
+# overall_visual_summary()
+delete_expense()
